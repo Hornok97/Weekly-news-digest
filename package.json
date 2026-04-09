@@ -1,0 +1,26 @@
+{
+  "name": "weekly-news-digest",
+  "version": "1.0.0",
+  "description": "Týdenní AI zpravodajský digest – iDnes + Extra.cz",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "scrape": "node src/index.js --scrape",
+    "digest": "node src/index.js --digest",
+    "build": "node src/index.js --build",
+    "test": "node --test tests/unit/store.test.js",
+    "test:scrape": "node --test tests/integration/idnes.test.js tests/integration/extra.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.85.0",
+    "axios": "^1.14.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^17.4.1",
+    "fast-xml-parser": "^5.5.10",
+    "node-cron": "^4.2.1"
+  }
+}
