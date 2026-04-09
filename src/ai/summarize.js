@@ -20,7 +20,7 @@ ${formatList(extraArticles)}
 Ukol:
 1. Z iDnes vyber 5-8 nejdulezitejsich zprav. Kazdou shrn do 1-2 vet. Rad od nejdulezitejsi.
 2. Z Extra.cz vyber 4-5 nejzajimavejsich bulvarnich zprav. Kazdou shrn do 1 vety.
-3. Pis cesky, neutralne, strucne.
+3. Pis POUZE cesky. Nikdy nepouzivej jina pismena nez ceska latinka. Zadna ruska, arabska ani jina pisma.
 4. Vystup formatuj jako HTML vhodne pro email (pouzij <h2>, <ul>, <li>, <b>).
 
 Struktura vystupu:

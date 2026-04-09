@@ -53,7 +53,7 @@ function pageShell(title, body) {
 <body>
   <div class="container">
     ${body}
-    <footer>Generovano pomoci Claude AI ze zdroju iDnes.cz a Extra.cz</footer>
+    <footer>Generovano pomoci Groq / Llama 3.3 ze zdroju iDnes.cz a Extra.cz</footer>
   </div>
 </body>
 </html>`;
