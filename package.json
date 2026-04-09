@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.85.0",
+    "@google/genai": "^1.49.0",
     "axios": "^1.14.0",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^17.4.1",

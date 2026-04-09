@@ -1,6 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenAI } from '@google/genai';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function summarizeArticles(idnesArticles, extraArticles) {
   const formatList = (articles) =>
@@ -34,11 +34,10 @@ Struktura vystupu:
   <li><b>Jmeno/tema:</b> strucne shrnuti...</li>
 </ul>`;
 
-  const message = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
+  const response = await client.models.generateContent({
+    model: 'gemini-2.0-flash',
+    contents: prompt,
   });
 
-  return message.content[0].text;
+  return response.text;
 }
