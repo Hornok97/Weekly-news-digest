@@ -1,6 +1,6 @@
-import { GoogleGenAI } from '@google/genai';
+import Groq from 'groq-sdk';
 
-const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function summarizeArticles(idnesArticles, extraArticles) {
   const formatList = (articles) =>
@@ -34,10 +34,11 @@ Struktura vystupu:
   <li><b>Jmeno/tema:</b> strucne shrnuti...</li>
 </ul>`;
 
-  const response = await client.models.generateContent({
-    model: 'gemini-2.0-flash',
-    contents: prompt,
+  const response = await client.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages: [{ role: 'user', content: prompt }],
+    max_tokens: 1500,
   });
 
-  return response.text;
+  return response.choices[0].message.content;
 }
