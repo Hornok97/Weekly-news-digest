@@ -12,8 +12,8 @@
     "test": "node --test tests/unit/store.test.js",
     "test:scrape": "node --test tests/integration/idnes.test.js tests/integration/extra.test.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["web-scraping", "news-digest", "groq", "llm", "cheerio", "github-actions", "czech"],
+  "author": "Michal Hornok",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.14.0",
