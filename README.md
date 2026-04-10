@@ -12,17 +12,17 @@
 
 ## What it does
 
-Every day, a GitHub Actions workflow scrapes news articles from [iDnes.cz](https://www.idnes.cz) (via RSS) and [Extra.cz](https://www.extra.cz) (via HTML scraping). Articles accumulate in JSON files throughout the week. Every Monday, a second workflow sends the week's articles to the Groq API (Llama 3.3 70B), which produces a structured Czech-language summary. The static site is then rebuilt and published to GitHub Pages automatically.
+Every day at 18:00 UTC, a GitHub Actions workflow scrapes news articles from [iDnes.cz](https://www.idnes.cz) (via RSS) and [Extra.cz](https://www.extra.cz) (pages 1–5 of `/tema/news/`, via HTML scraping). Articles accumulate in JSON files throughout the week. Every Monday, a second workflow sends the week's articles to the Groq API (Llama 3.3 70B), which produces a structured Czech-language summary. The static site is then rebuilt and published to GitHub Pages automatically.
 
 No server. No database. No manual work.
 
 ## Pipeline
 
 ```
-Every day 08:00 UTC — GitHub Actions
+Every day 18:00 UTC — GitHub Actions
 ┌─────────────────────────────────────────────┐
-│  iDnes RSS feed  →  XML parse  →  articles  │
-│  Extra.cz HTML   →  cheerio    →  articles  │
+│  iDnes RSS feed      →  XML parse           │
+│  Extra.cz /tema/news →  cheerio (pages 1-5) │
 │                                             │
 │  Deduplicate by URL                         │
 │  Append to data/articles-YYYY-Www.json      │
@@ -69,7 +69,7 @@ Every Monday 09:00 UTC — GitHub Actions
 src/
   scrapers/
     idnes.js        RSS feed scraper
-    extra.js        HTML scraper with JSON-LD date extraction
+    extra.js        HTML scraper, pages 1-5 of /tema/news/, JSON-LD date extraction
   storage/
     store.js        File-based storage, ISO week key logic
   ai/
@@ -89,7 +89,7 @@ tests/
     extra.test.js          Live Extra.cz scrape, knownLinks skip logic
 
 .github/workflows/
-  scrape.yml        Daily scrape (cron 08:00 UTC)
+  scrape.yml        Daily scrape (cron 18:00 UTC)
   digest.yml        Weekly digest + site build (Monday 09:00 UTC)
   test.yml          Unit tests on every push to main
 
@@ -125,6 +125,22 @@ npm run test:scrape   # integration tests — live network, ~45s
 2. Add secret `GROQ_API_KEY` in Settings → Secrets and variables → Actions
 3. Enable GitHub Pages: Settings → Pages → Source: `main` branch, `/docs` folder
 4. Workflows trigger automatically — or run manually via Actions → Run workflow
+
+## Changelog
+
+### 2026-04-10
+- **Extra.cz multi-page scraping** — scraper now iterates pages 1–5 of `/tema/news/` instead of just the homepage, yielding ~150 candidates per run vs. ~30 before
+- **Cron moved to 18:00 UTC** — scrape runs at end of day (20:00 CEST) when the day's news cycle is complete
+- **Lazy AI import** — `summarize.js` is now dynamically imported only during digest runs; scrape workflow no longer requires `GROQ_API_KEY`
+- **GitHub Actions permissions** — added `contents: write` to scrape and digest jobs to allow automated commits
+- **Node.js 22** — upgraded from Node 20 across all workflows
+
+### 2026-04-09 — initial release
+- Daily scrape from iDnes.cz (RSS) and Extra.cz (HTML + JSON-LD)
+- Weekly AI digest via Groq API (Llama 3.3 70B), free tier
+- Static site published to GitHub Pages
+- Unit and integration tests with Node.js built-in `node:test`
+- Three GitHub Actions workflows: scrape, digest, tests
 
 ---
 
