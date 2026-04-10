@@ -1,7 +1,8 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-const PAGE_URL = 'https://www.extra.cz/?page=1';
+const NEWS_URL = 'https://www.extra.cz/tema/news/';
+const PAGES = 5;
 const ARTICLE_PATH_RE = /^\/[a-z0-9]+-[a-z0-9-]+-[a-f0-9]{4,6}$/;
 const DELAY_MS = 400;
 
@@ -37,33 +38,46 @@ async function fetchArticleDate(url) {
   return null;
 }
 
-export async function scrapeExtra(knownLinks = new Set()) {
-  const res = await http.get(PAGE_URL);
-  const $ = cheerio.load(res.data);
+async function collectCandidates() {
   const seen = new Set();
   const candidates = [];
 
-  $('a[href]').each((_, el) => {
-    const href = $(el).attr('href') ?? '';
-    let path;
+  for (let page = 1; page <= PAGES; page++) {
     try {
-      const url = new URL(href, 'https://www.extra.cz');
-      if (url.hostname !== 'www.extra.cz' && url.hostname !== 'extra.cz') return;
-      path = url.pathname;
-    } catch { return; }
+      const res = await http.get(`${NEWS_URL}${page}`);
+      const $ = cheerio.load(res.data);
 
-    if (!ARTICLE_PATH_RE.test(path)) return;
-    if (seen.has(path)) return;
-    seen.add(path);
+      $('a[href]').each((_, el) => {
+        const href = $(el).attr('href') ?? '';
+        let path;
+        try {
+          const url = new URL(href, 'https://www.extra.cz');
+          if (url.hostname !== 'www.extra.cz' && url.hostname !== 'extra.cz') return;
+          path = url.pathname;
+        } catch { return; }
 
-    const title = $(el).text().trim() || $(el).attr('title')?.trim() || '';
-    if (!title || title.length < 10) return;
+        if (!ARTICLE_PATH_RE.test(path)) return;
+        if (seen.has(path)) return;
+        seen.add(path);
 
-    candidates.push({ path, title });
-  });
+        const title = $(el).text().trim() || $(el).attr('title')?.trim() || '';
+        if (!title || title.length < 10) return;
+
+        candidates.push({ path, title });
+      });
+    } catch {
+      // page unavailable, skip
+    }
+  }
+
+  return candidates;
+}
+
+export async function scrapeExtra(knownLinks = new Set()) {
+  const candidates = await collectCandidates();
 
   const articles = [];
-  for (const { path, title } of candidates.slice(0, 30)) {
+  for (const { path, title } of candidates) {
     const link = `https://www.extra.cz${path}`;
 
     if (knownLinks.has(link)) continue;
