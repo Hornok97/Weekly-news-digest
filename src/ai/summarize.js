@@ -1,6 +1,13 @@
 import Groq from 'groq-sdk';
 
-const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let client = null;
+
+function getClient() {
+  if (!client) {
+    client = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return client;
+}
 
 export async function summarizeArticles(idnesArticles, extraArticles) {
   const formatList = (articles) =>
@@ -34,7 +41,7 @@ Struktura vystupu:
   <li><b>Jmeno/tema:</b> strucne shrnuti...</li>
 </ul>`;
 
-  const response = await client.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [{ role: 'user', content: prompt }],
     max_tokens: 1500,
