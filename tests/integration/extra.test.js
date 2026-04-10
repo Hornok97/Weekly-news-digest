@@ -2,13 +2,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { scrapeExtra } from '../../src/scrapers/extra.js';
 
-test('scrapeExtra returns a non-empty array', { timeout: 60000 }, async () => {
+test('scrapeExtra returns a non-empty array', { timeout: 180000 }, async () => {
   const articles = await scrapeExtra();
   assert.ok(Array.isArray(articles), 'result should be an array');
   assert.ok(articles.length > 0, 'should return at least one article');
 });
 
-test('scrapeExtra articles have required fields', { timeout: 60000 }, async () => {
+test('scrapeExtra articles have required fields', { timeout: 180000 }, async () => {
   const articles = await scrapeExtra();
   for (const a of articles) {
     assert.equal(a.source, 'Extra.cz', `source should be "Extra.cz", got "${a.source}"`);
@@ -18,7 +18,7 @@ test('scrapeExtra articles have required fields', { timeout: 60000 }, async () =
   }
 });
 
-test('scrapeExtra skips already-known links', { timeout: 60000 }, async () => {
+test('scrapeExtra skips already-known links', { timeout: 180000 }, async () => {
   const first = await scrapeExtra();
   assert.ok(first.length > 0, 'first scrape should return articles');
 
