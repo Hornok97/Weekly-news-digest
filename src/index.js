@@ -2,7 +2,6 @@ import 'dotenv/config';
 import cron from 'node-cron';
 import { scrapeIdnes } from './scrapers/idnes.js';
 import { scrapeExtra } from './scrapers/extra.js';
-import { summarizeArticles } from './ai/summarize.js';
 import { appendArticles, loadArticles, saveDigest, getWeekKey, getPrevWeekKey } from './storage/store.js';
 import { buildSite } from '../scripts/build-site.js';
 
@@ -40,6 +39,7 @@ async function runWeeklyDigest() {
       return;
     }
 
+    const { summarizeArticles } = await import('./ai/summarize.js');
     const summary = await summarizeArticles(idnesArticles, extraArticles);
     saveDigest(weekKey, summary);
     console.log(`  Digest saved for ${weekKey}`);
