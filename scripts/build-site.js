@@ -38,6 +38,12 @@ const CSS = `
   .week-card .arrow { color: #1a73e8; font-size: 20px; }
   .no-digest { background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; padding: 12px 16px; font-size: 14px; color: #795548; margin-bottom: 24px; }
   .back { font-size: 14px; margin-bottom: 24px; display: inline-block; }
+  .articles-section { margin-top: 48px; }
+  .articles-section h2 { font-size: 15px; }
+  .article-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; display: flex; justify-content: space-between; gap: 12px; }
+  .article-item a { color: #222; flex: 1; }
+  .article-item a:hover { color: #1a73e8; }
+  .article-date { font-size: 12px; color: #aaa; white-space: nowrap; }
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #dde3f0; font-size: 12px; color: #aaa; }
 `;
 
@@ -59,15 +65,28 @@ function pageShell(title, body) {
 </html>`;
 }
 
+function articleList(articles) {
+  if (articles.length === 0) return '<p style="font-size:14px;color:#aaa">Zadne clanky.</p>';
+  return articles
+    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+    .map(a => {
+      const date = a.pubDate ? new Date(a.pubDate).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric' }) : '';
+      return `<div class="article-item">
+        <a href="${a.link}" target="_blank" rel="noopener">${a.title}</a>
+        <span class="article-date">${date}</span>
+      </div>`;
+    }).join('');
+}
+
 function buildWeekPage(weekKey) {
   const articles = loadArticles(weekKey);
   const digest = loadDigest(weekKey);
   const label = weekLabel(weekKey);
-  const idnesCount = articles.filter(a => a.source === 'iDnes').length;
-  const extraCount = articles.filter(a => a.source === 'Extra.cz').length;
+  const idnesArticles = articles.filter(a => a.source === 'iDnes');
+  const extraArticles = articles.filter(a => a.source === 'Extra.cz');
 
   const digestSection = digest
-    ? digest
+    ? `<h2>AI Souhrn</h2>${digest}`
     : `<p class="no-digest">AI souhrn pro tento tyden jeste neni k dispozici.</p>`;
 
   const body = `
@@ -77,9 +96,12 @@ function buildWeekPage(weekKey) {
     </header>
     <a class="back" href="../index.html">&larr; Vsechny tydny</a>
     ${digestSection}
-    <p style="font-size:13px;color:#888;margin-top:32px">
-      Zpracovano ${idnesCount} clanku z iDnes a ${extraCount} clanku z Extra.cz.
-    </p>`;
+    <div class="articles-section">
+      <h2>iDnes &mdash; ${idnesArticles.length} clanku</h2>
+      ${articleList(idnesArticles)}
+      <h2 style="margin-top:28px">Extra.cz &mdash; ${extraArticles.length} clanku</h2>
+      ${articleList(extraArticles)}
+    </div>`;
 
   return pageShell(`Digest ${weekKey}`, body);
 }

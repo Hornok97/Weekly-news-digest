@@ -31,3 +31,19 @@ jobs:
           git add data/
           git diff --cached --quiet || git commit -m "scrape: $(date -u +%Y-%m-%d)"
           git push
+
+      - name: Send scrape report
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "News Digest – scrape $(date -u +%Y-%m-%d)"
+          to: ${{ secrets.EMAIL_TO }}
+          from: Weekly News Digest <${{ secrets.EMAIL_USER }}>
+          body: |
+            Dnesni scraping probehl uspesne.
+
+            Data jsou ulozena a pripravena pro pondeli.
+            Webovy prehled: https://hornok97.github.io/Weekly-news-digest/
