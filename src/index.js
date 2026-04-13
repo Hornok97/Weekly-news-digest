@@ -29,8 +29,9 @@ async function runWeeklyDigest() {
 
   try {
     const articles = loadArticles(weekKey);
-    const idnesArticles = articles.filter(a => a.source === 'iDnes');
-    const extraArticles = articles.filter(a => a.source === 'Extra.cz');
+    const byDate = (a, b) => new Date(b.pubDate) - new Date(a.pubDate);
+    const idnesArticles = articles.filter(a => a.source === 'iDnes').sort(byDate).slice(0, 40);
+    const extraArticles = articles.filter(a => a.source === 'Extra.cz').sort(byDate).slice(0, 40);
 
     console.log(`  iDnes: ${idnesArticles.length}, Extra.cz: ${extraArticles.length}`);
 
